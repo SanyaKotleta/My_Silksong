@@ -1,4 +1,4 @@
-#include <curses.h>
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -27,13 +27,17 @@ int main() {
 }
 
 void gameplay(char map[][LENGHT], object player) {
+    initscr();
+    noecho();
+    FILE *f = freopen("/dev/tty", "r", stdin);
     while (player.x != 1911) {
         grid(map);
         map[player.y][player.x] = '@';
-        control(&player);
         output(map);
-        printf("\n");
+        control(&player);
     }
+    endwin();
+    fclose(f);
 }
 
 void grid(char map[][LENGHT]) {
@@ -49,26 +53,26 @@ void grid(char map[][LENGHT]) {
 
 void control(object *player) {
     char control = 0;
-    control = getchar();
+    control = getch();
     if (control == 'a') player->x -= 1;
     if (control == 'd') player->x += 1;
     if (control == ']') player->x = 1911;
 }
 
 void output(char map[][LENGHT]) {
-    for (int i = 0; i < 100; i++) printf("\n");
-    for (int i = 0; i < 2 * LENGHT + 1; i++) printf("%%");
-    printf("\n");
+    erase();
+    for (int i = 0; i < 2 * LENGHT + 1; i++) printw("%%");
+    printw("\n");
     for (int i = 0; i < HEIGHT; i++) {
-        printf("%%");
+        printw("%%");
         for (int j = 0; j < LENGHT; j++) {
             if (j != LENGHT - 1)
-                printf("%c ", map[i][j]);
+                printw("%c ", map[i][j]);
             else
-                printf("%c", map[i][j]);
+                printw("%c", map[i][j]);
         }
-        printf("%%");
-        if (HEIGHT != 0) printf("\n");
+        printw("%%");
+        if (HEIGHT != 0) printw("\n");
     }
-    for (int i = 0; i < 2 * LENGHT + 1; i++) printf("%%");
+    for (int i = 0; i < 2 * LENGHT + 1; i++) printw("%%");
 }
